@@ -1,4 +1,5 @@
 import { ImageResponse } from "@vercel/og";
+import { write } from "../../utilities/svg";
 
 export const config = {
   runtime: "edge",
@@ -11,20 +12,17 @@ export default async function (req) {
   let [message, to, signature] = params;
 
   message = message.split("=")[1];
+  message = decodeURIComponent(message);
+  // remove + from message
+  message = message.replace(/\+/g, " ");
   to = to.split("=")[1];
-  signature = signature.split("=")[1];
+  signature = signature ? signature.split("=")[1] : "";
   // make xhr request to get user data
   // const res = await fetch(`https://opeper-backend.vercel.app/api/twitter?id=${handle}`);
   // const {colors, img} = await res.json();
 
-  let colors = {
-    background: "#000",
-    hair: "#000",
-    jaw: "#000",
-    chest: "#000",
-    shoulder: "#000",
-    face: "#000",
-  };
+  let currentStamp =
+    "https://opepenai.nyc3.digitaloceanspaces.com/images/c0821a17-9974-4604-b28d-fd5f2c61a611@lg.png";
 
   let sign = decodeURIComponent(signature);
 
@@ -68,7 +66,48 @@ export default async function (req) {
 
           <g stroke="#222" strokeWidth="2px" fill="#000">
             <rect x="720" y="20" width="50" height="50" />
+            <foreignObject>
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
+                  float: "left",
+                  left: 745,
+                  top: -205,
+                }}
+              >
+                <img id="stamp" width="50" src={currentStamp} />
+              </div>
+            </foreignObject>
           </g>
+
+          <g transform="translate(20, 20)" fill="#fff">
+            {write(message, "#fff", 3)}
+          </g>
+          {signature && (
+            <g x="420" y="120" width="300" height="450">
+              {/* draw sign */}
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
+                  float: "left",
+                  left: 500,
+                  top: 100,
+                }}
+              >
+                <img id="sign" width="300" src={sign} />
+              </div>
+            </g>
+          )}
         </svg>
       </div>
     ),
